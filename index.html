@@ -107,7 +107,6 @@ button:active{transform:scale(.99)}button.secondary{background:#293140;color:#ff
 <script>
 "use strict";
 const ghosts=["Spirit","Wraith","Phantom","Poltergeist","Banshee","Jinn","Mare","Revenant","Shade","Demon","Yurei","Oni","Yokai","Hantu","Goryo","Myling","Onryo","The Twins","Raiju","Obake","The Mimic","Moroi","Deogen","Thaye","Dayan","Gallu","Obambo","Kormos","Aswang","Deildegast"];
-
 const Q=[
 {id:"rev",cat:"hunt",tier:"hard",targets:["Revenant"],q:"Was it about 1.0 m/s while searching, then instantly around 3.0 m/s after detecting a player?",hint:"Revenant has no standard LOS acceleration: it switches from very slow to very fast on detection.",yes:{"Revenant":26,"The Mimic":5},no:{"Revenant":-12}},
 {id:"deo",cat:"hunt",tier:"hard",targets:["Deogen"],q:"Did it rush toward a player from far away, then slow dramatically to about 0.4 m/s when very close?",hint:"Deogen always senses its target and slows heavily at close range.",yes:{"Deogen":27,"The Mimic":5},no:{"Deogen":-12}},
@@ -139,212 +138,37 @@ const Q=[
 {id:"goryo",cat:"evidence",tier:"hard",targets:["Goryo"],q:"When DOTS was available, did DOTS appear only through a video camera while no player was physically near the ghost?",hint:"Skip this on true 0-evidence. Goryo DOTS has special viewing conditions.",yes:{"Goryo":27,"The Mimic":2},no:{"Goryo":-5}},
 {id:"mimic",cat:"evidence",tier:"hard",targets:["The Mimic"],q:"Did you get Ghost Orbs plus a separate valid evidence set or a signature behavior that seemed to belong to another ghost?",hint:"The Mimic can imitate hunt patterns and has fake Ghost Orbs in addition to its real evidence.",yes:{"The Mimic":32},no:{"The Mimic":-2}}
 ];
-
 let state={scores:{},asked:[],history:[],answered:0,huntMode:false,current:null,started:false,huntDraft:{}};
-
 function freshScores(){return Object.fromEntries(ghosts.map(g=>[g,0]));}
 function save(){try{localStorage.setItem("ghostWizardV4",JSON.stringify(state));}catch(e){}}
 function load(){try{const x=JSON.parse(localStorage.getItem("ghostWizardV4")||"null");if(x&&x.started&&x.scores&&x.asked)return x;}catch(e){}return null;}
 function ranked(){return Object.entries(state.scores).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));}
-function probabilities(){
-  const r=ranked();
-  if(state.answered===0)return r.map(([g])=>[g,100/ghosts.length]);
-  const vals=r.map(([g,s])=>[g,Math.exp(Math.max(-45,Math.min(70,s))/11)]);
-  const sum=vals.reduce((a,x)=>a+x[1],0)||1;
-  return vals.map(([g,v])=>[g,100*v/sum]);
-}
+function probabilities(){const r=ranked();if(state.answered===0)return r.map(([g])=>[g,100/ghosts.length]);const vals=r.map(([g,s])=>[g,Math.exp(Math.max(-45,Math.min(70,s))/11)]);const sum=vals.reduce((a,x)=>a+x[1],0)||1;return vals.map(([g,v])=>[g,100*v/sum]);}
 function topCandidates(n=6){return probabilities().slice(0,n).map(x=>x[0]);}
-function questionUtility(q){
-  const top=topCandidates(8);
-  const yesVals=top.map(g=>(q.yes&&q.yes[g])||0);
-  const noVals=top.map(g=>(q.no&&q.no[g])||0);
-  const spread=a=>{const m=a.reduce((x,y)=>x+y,0)/Math.max(1,a.length);return a.reduce((s,x)=>s+(x-m)*(x-m),0)/Math.max(1,a.length);};
-  let u=spread(yesVals)+0.55*spread(noVals);
-  const direct=q.targets.filter(g=>top.includes(g)).length;
-  u+=direct*15;
-  if(q.tier==="hard")u+=5; else if(q.tier==="strong")u+=2;
-  if(state.answered<3 && q.cat==="hunt")u+=3;
-  return u;
-}
-function chooseNext(){
-  const pool=Q.filter(q=>!state.asked.includes(q.id));
-  if(!pool.length)return null;
-  return pool.sort((a,b)=>questionUtility(b)-questionUtility(a))[0];
-}
+function questionUtility(q){const top=topCandidates(8);const yesVals=top.map(g=>(q.yes&&q.yes[g])||0);const noVals=top.map(g=>(q.no&&q.no[g])||0);const spread=a=>{const m=a.reduce((x,y)=>x+y,0)/Math.max(1,a.length);return a.reduce((s,x)=>s+(x-m)*(x-m),0)/Math.max(1,a.length);};let u=spread(yesVals)+0.55*spread(noVals);const direct=q.targets.filter(g=>top.includes(g)).length;u+=direct*15;if(q.tier==="hard")u+=5;else if(q.tier==="strong")u+=2;if(state.answered<3&&q.cat==="hunt")u+=3;return u;}
+function chooseNext(){const pool=Q.filter(q=>!state.asked.includes(q.id));if(!pool.length)return null;return pool.sort((a,b)=>questionUtility(b)-questionUtility(a))[0];}
 function apply(map){Object.entries(map||{}).forEach(([g,d])=>state.scores[g]=(state.scores[g]||0)+d);}
 function startNew(){state={scores:freshScores(),asked:[],history:[],answered:0,huntMode:false,current:null,started:true,huntDraft:{}};document.getElementById("home").classList.add("hidden");document.getElementById("results").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");document.getElementById("topbar").classList.remove("hidden");nextQuestion();save();}
 function resume(){const x=load();if(!x)return startNew();state=x;state.huntDraft=state.huntDraft||{};document.getElementById("home").classList.add("hidden");document.getElementById("results").classList.add("hidden");document.getElementById("topbar").classList.remove("hidden");if(state.huntMode){showHuntQuick();return;}document.getElementById("quiz").classList.remove("hidden");if(!state.current||state.asked.includes(state.current))state.current=chooseNext()?.id||null;render();}
-
-function renderTop3(){
-  const p=probabilities().slice(0,3);
-  document.getElementById("top3").innerHTML=p.map(([g,v],i)=>`<div class="suspect"><b>${i+1}. ${g}</b><span>${v.toFixed(1)}% match</span></div>`).join("");
-  document.getElementById("modeLabel").textContent=state.huntMode?"Hunt quick entry":"Investigation mode";
-}
-function renderRanking(id,limit=5){
-  const p=probabilities().slice(0,limit),max=p[0]?.[1]||1;
-  document.getElementById(id).innerHTML='<div class="ranktitle">Most likely right now</div><div class="ranknote">Relative behavior-match weights—not literal spawn odds.</div>'+p.map(([g,v],idx)=>`<div class="rankrow"><div class="rankname"><b>${idx+1}. ${g}</b></div><div class="bar"><div class="fill" style="width:${Math.max(3,v/max*100).toFixed(1)}%"></div></div><div class="pct">${v.toFixed(1)}%</div></div>`).join("");
-}
-function confidence(){
-  const p=probabilities();if(state.answered<2)return"Low confidence";
-  const gap=(p[0]?.[1]||0)-(p[1]?.[1]||0);
-  if(gap>45&&state.answered>=3)return"Very strong";
-  if(gap>25)return"Strong";
-  if(gap>12)return"Moderate";
-  return"Low confidence";
-}
-function render(){
-  renderTop3();
-  renderRanking("ranking",5);
-  const q=Q.find(x=>x.id===state.current);
-  if(!q)return showResults();
-  document.getElementById("question").textContent=q.q;
-  document.getElementById("hint").textContent=q.hint;
-  document.getElementById("qmeta").innerHTML=`<span class="tag">${q.cat==="hunt"?"Hunt observation":q.cat==="evidence"?"Evidence / camera":"General behavior"}</span><span class="tag">${q.tier==="hard"?"Hard positive tell":q.tier==="strong"?"Strong tell":"Soft behavior"}</span>`;
-  const remaining=Q.length-state.asked.length;
-  document.getElementById("status").textContent=`${state.answered} answered • ${remaining} unasked`;
-  document.getElementById("strength").textContent=confidence();
-  document.getElementById("progressFill").style.width=`${Math.min(100,state.asked.length/Q.length*100)}%`;
-  document.getElementById("huntBanner").classList.add("hidden");
-  document.getElementById("huntToggle").textContent="Log a Hunt";
-}
+function renderTop3(){const p=probabilities().slice(0,3);document.getElementById("top3").innerHTML=p.map(([g,v],i)=>`<div class="suspect"><b>${i+1}. ${g}</b><span>${v.toFixed(1)}% match</span></div>`).join("");document.getElementById("modeLabel").textContent=state.huntMode?"Hunt quick entry":"Investigation mode";}
+function renderRanking(id,limit=5){const p=probabilities().slice(0,limit),max=p[0]?.[1]||1;document.getElementById(id).innerHTML='<div class="ranktitle">Most likely right now</div><div class="ranknote">Relative behavior-match weights—not literal spawn odds.</div>'+p.map(([g,v],idx)=>`<div class="rankrow"><div class="rankname"><b>${idx+1}. ${g}</b></div><div class="bar"><div class="fill" style="width:${Math.max(3,v/max*100).toFixed(1)}%"></div></div><div class="pct">${v.toFixed(1)}%</div></div>`).join("");}
+function confidence(){const p=probabilities();if(state.answered<2)return"Low confidence";const gap=(p[0]?.[1]||0)-(p[1]?.[1]||0);if(gap>45&&state.answered>=3)return"Very strong";if(gap>25)return"Strong";if(gap>12)return"Moderate";return"Low confidence";}
+function render(){renderTop3();renderRanking("ranking",5);const q=Q.find(x=>x.id===state.current);if(!q)return showResults();document.getElementById("question").textContent=q.q;document.getElementById("hint").textContent=q.hint;document.getElementById("qmeta").innerHTML=`<span class="tag">${q.cat==="hunt"?"Hunt observation":q.cat==="evidence"?"Evidence / camera":"General behavior"}</span><span class="tag">${q.tier==="hard"?"Hard positive tell":q.tier==="strong"?"Strong tell":"Soft behavior"}</span>`;const remaining=Q.length-state.asked.length;document.getElementById("status").textContent=`${state.answered} answered • ${remaining} unasked`;document.getElementById("strength").textContent=confidence();document.getElementById("progressFill").style.width=`${Math.min(100,state.asked.length/Q.length*100)}%`;document.getElementById("huntBanner").classList.add("hidden");document.getElementById("huntToggle").textContent="Log a Hunt";}
 function nextQuestion(){const q=chooseNext();state.current=q?q.id:null;render();save();}
-function answer(kind){
-  const q=Q.find(x=>x.id===state.current);if(!q)return;
-  state.history.push({scores:{...state.scores},asked:[...state.asked],answered:state.answered,current:state.current,huntMode:state.huntMode,kind,qid:q.id});
-  if(kind==="yes"){apply(q.yes);state.answered++;}
-  else if(kind==="no"){apply(q.no);state.answered++;}
-  state.asked.push(q.id);
-  state.current=null;
-  nextQuestion();
-}
-function undo(){
-  const h=state.history.pop();if(!h)return;
-  state.scores=h.scores;state.asked=h.asked;state.answered=h.answered;state.current=h.current;state.huntMode=h.huntMode;
-  render();save();
-}
-const HUNT_GROUPS=[
-  {id:"speed",title:"Speed pattern",options:[
-    {label:"Very slow searching → instantly very fast on detection",qid:"rev"},
-    {label:"Fast from far away → crawls when very close",qid:"deo"},
-    {label:"Speed changed with room temperature",qid:"hantu"},
-    {label:"Very fast with no LOS acceleration; slower later in contract",qid:"thaye"},
-    {label:"Base speed increased as sanity got lower",qid:"moroi"}
-  ]},
-  {id:"los",title:"LOS / electronics / movement",options:[
-    {label:"Flat ~2.5 m/s near active electronics",qid:"raiju"},
-    {label:"Breaker ON: ~2.5 m/s when seeing player >3 m away",qid:"jinn"},
-    {label:"Slightly slow base speed, but accelerated in LOS unusually fast",qid:"aswang"},
-    {label:"Within ~10 m: faster when player walked, slower when still",qid:"dayan"},
-    {label:"Detected player movement at odd ranges but seemed nearly blind",qid:"kormos"}
-  ]},
-  {id:"blink",title:"Blinking / visibility",options:[
-    {label:"Shapeshifted into another ghost model",qid:"obake"},
-    {label:"Long invisible gaps between blinks",qid:"phantom"},
-    {label:"Unusually visible / short invisible gaps",qid:"oni"}
-  ]},
-  {id:"sound",title:"Footsteps / detection",options:[
-    {label:"Electronics interfered before footsteps were clearly audible",qid:"myling"}
-  ]},
-  {id:"crosshunt",title:"Across hunts / setup effects",options:[
-    {label:"Two distinct base hunt speeds across different hunts",qid:"twins"},
-    {label:"Much slower after many unique item/switch/tap/breaker interactions",qid:"deilde"},
-    {label:"Speed/state changed after salt, incense, or crucifix",qid:"gallu"}
-  ]},
-  {id:"special",title:"Special overall pattern",options:[
-    {label:"Hunt behavior copied a very distinctive ghost pattern, but other behavior/evidence conflicts",qid:"mimic"}
-  ]}
-];
-function showHuntQuick(){
-  state.huntMode=true;state.huntDraft=state.huntDraft||{};
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("results").classList.add("hidden");
-  document.getElementById("huntQuick").classList.remove("hidden");
-  renderTop3();renderHuntGroups();save();
-}
-function renderHuntGroups(){
-  const wrap=document.getElementById("huntGroups");
-  wrap.innerHTML=HUNT_GROUPS.map(group=>`<div class="huntGroup"><h3>${group.title}</h3><div class="huntChoices">${group.options.map(opt=>`<button class="huntChoice ${state.huntDraft[group.id]===opt.qid?"selected":""}" data-group="${group.id}" data-qid="${opt.qid}">${opt.label}</button>`).join("")}<button class="huntChoice none ${state.huntDraft[group.id]==="none"?"selected":""}" data-group="${group.id}" data-qid="none">Nothing clear / not observed</button></div></div>`).join("");
-  wrap.querySelectorAll(".huntChoice").forEach(btn=>btn.addEventListener("click",()=>{state.huntDraft[btn.dataset.group]=btn.dataset.qid;renderHuntGroups();save();}));
-}
-function cancelHunt(){
-  state.huntMode=false;state.huntDraft={};
-  document.getElementById("huntQuick").classList.add("hidden");
-  document.getElementById("quiz").classList.remove("hidden");
-  render();save();
-}
-function endHunt(){
-  const observations=Object.values(state.huntDraft||{}).filter(qid=>qid&&qid!=="none");
-  const unique=[...new Set(observations)].filter(qid=>Q.some(q=>q.id===qid));
-  if(unique.length){
-    state.history.push({scores:{...state.scores},asked:[...state.asked],answered:state.answered,current:state.current,huntMode:false,kind:"huntBatch",observations:[...unique]});
-    unique.forEach(qid=>{const q=Q.find(x=>x.id===qid);apply(q.yes);if(!state.asked.includes(qid))state.asked.push(qid);});
-    state.answered+=unique.length;
-  }
-  state.huntMode=false;state.huntDraft={};state.current=null;
-  document.getElementById("huntQuick").classList.add("hidden");
-  document.getElementById("quiz").classList.remove("hidden");
-  nextQuestion();save();
-}
-function evidenceLines(ghost){
-  const lines=[];
-  for(let idx=state.history.length-1;idx>=0;idx--){
-    const h=state.history[idx];
-    if(h.kind==="huntBatch"){
-      for(const qid of (h.observations||[])){
-        const q=Q.find(x=>x.id===qid);if(!q)continue;
-        const val=q.yes?.[ghost]||0;
-        if(val)lines.push({val,text:"Hunt observation: "+q.q});
-        if(lines.length>=4)break;
-      }
-    }else{
-      const q=Q.find(x=>x.id===h.qid);if(!q||h.kind==="skip")continue;
-      const val=h.kind==="yes"?(q.yes?.[ghost]||0):(q.no?.[ghost]||0);
-      if(val)lines.push({val,text:(h.kind==="yes"?"Observed: ":"Tested no: ")+q.q});
-    }
-    if(lines.length>=4)break;
-  }
-  return lines.slice(0,4);
-}
-function bestNextTest(ghost){
-  const candidate=Q.filter(q=>!state.asked.includes(q.id)&&((q.yes?.[ghost]||0)>0)).sort((a,b)=>(b.yes?.[ghost]||0)-(a.yes?.[ghost]||0))[0];
-  if(candidate)return candidate.q;
-  const fallback={
-    "The Mimic":"Check for Ghost Orbs plus the ghost's actual evidence, and repeat any signature hunt behavior.",
-    "Revenant":"During a safe loop/hide test, compare its searching speed with its speed immediately after detecting someone.",
-    "Deogen":"Loop it in open space and confirm whether it becomes extremely slow at close range.",
-    "Hantu":"Compare its speed while it travels through cold versus warm rooms.",
-    "Raiju":"Place active electronics along one part of a loop and compare speed inside versus outside their range."
-  };
-  return fallback[ghost]||"Repeat the strongest positive behavior under controlled conditions; avoid ruling out a chance-based ghost from one missed ability.";
-}
-function showResults(){
-  const p=probabilities(),top=p[0]||["Unknown",0],g=top[0];
-  document.getElementById("quiz").classList.add("hidden");document.getElementById("huntQuick").classList.add("hidden");document.getElementById("results").classList.remove("hidden");document.getElementById("topbar").classList.remove("hidden");
-  renderTop3();renderRanking("finalRanking",5);
-  document.getElementById("ghost").textContent=state.answered?g:"Not enough information";
-  document.getElementById("whySummary").textContent=state.answered?`${confidence()}. ${g} currently holds ${top[1].toFixed(1)}% of the model's relative ranking weight.`:"Answer a few observations first.";
-  const lines=evidenceLines(g);
-  document.getElementById("whyBox").innerHTML='<b>Why this is #1</b>'+(lines.length?lines.map(x=>`<div class="whyline ${x.val>0?"plus":"minus"}">${x.val>0?"+":""}${x.val} • ${x.text}</div>`).join(""):'<div class="whyline muted">No direct supporting observation yet.</div>');
-  document.getElementById("nextTest").textContent=bestNextTest(g);
-  save();
-}
+function answer(kind){const q=Q.find(x=>x.id===state.current);if(!q)return;state.history.push({scores:{...state.scores},asked:[...state.asked],answered:state.answered,current:state.current,huntMode:state.huntMode,kind,qid:q.id});if(kind==="yes"){apply(q.yes);state.answered++;}else if(kind==="no"){apply(q.no);state.answered++;}state.asked.push(q.id);state.current=null;nextQuestion();}
+function undo(){const h=state.history.pop();if(!h)return;state.scores=h.scores;state.asked=h.asked;state.answered=h.answered;state.current=h.current;state.huntMode=h.huntMode;render();save();}
+const HUNT_GROUPS=[{id:"speed",title:"Speed pattern",options:[{label:"Very slow searching → instantly very fast on detection",qid:"rev"},{label:"Fast from far away → crawls when very close",qid:"deo"},{label:"Speed changed with room temperature",qid:"hantu"},{label:"Very fast with no LOS acceleration; slower later in contract",qid:"thaye"},{label:"Base speed increased as sanity got lower",qid:"moroi"}]},{id:"los",title:"LOS / electronics / movement",options:[{label:"Flat ~2.5 m/s near active electronics",qid:"raiju"},{label:"Breaker ON: ~2.5 m/s when seeing player >3 m away",qid:"jinn"},{label:"Slightly slow base speed, but accelerated in LOS unusually fast",qid:"aswang"},{label:"Within ~10 m: faster when player walked, slower when still",qid:"dayan"},{label:"Detected player movement at odd ranges but seemed nearly blind",qid:"kormos"}]},{id:"blink",title:"Blinking / visibility",options:[{label:"Shapeshifted into another ghost model",qid:"obake"},{label:"Long invisible gaps between blinks",qid:"phantom"},{label:"Unusually visible / short invisible gaps",qid:"oni"}]},{id:"sound",title:"Footsteps / detection",options:[{label:"Electronics interfered before footsteps were clearly audible",qid:"myling"}]},{id:"crosshunt",title:"Across hunts / setup effects",options:[{label:"Two distinct base hunt speeds across different hunts",qid:"twins"},{label:"Much slower after many unique item/switch/tap/breaker interactions",qid:"deilde"},{label:"Speed/state changed after salt, incense, or crucifix",qid:"gallu"}]},{id:"special",title:"Special overall pattern",options:[{label:"Hunt behavior copied a very distinctive ghost pattern, but other behavior/evidence conflicts",qid:"mimic"}]}];
+function showHuntQuick(){state.huntMode=true;state.huntDraft=state.huntDraft||{};document.getElementById("quiz").classList.add("hidden");document.getElementById("results").classList.add("hidden");document.getElementById("huntQuick").classList.remove("hidden");renderTop3();renderHuntGroups();save();}
+function renderHuntGroups(){const wrap=document.getElementById("huntGroups");wrap.innerHTML=HUNT_GROUPS.map(group=>`<div class="huntGroup"><h3>${group.title}</h3><div class="huntChoices">${group.options.map(opt=>`<button class="huntChoice ${state.huntDraft[group.id]===opt.qid?"selected":""}" data-group="${group.id}" data-qid="${opt.qid}">${opt.label}</button>`).join("")}<button class="huntChoice none ${state.huntDraft[group.id]==="none"?"selected":""}" data-group="${group.id}" data-qid="none">Nothing clear / not observed</button></div></div>`).join("");wrap.querySelectorAll(".huntChoice").forEach(btn=>btn.addEventListener("click",()=>{state.huntDraft[btn.dataset.group]=btn.dataset.qid;renderHuntGroups();save();}));}
+function cancelHunt(){state.huntMode=false;state.huntDraft={};document.getElementById("huntQuick").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");render();save();}
+function endHunt(){const observations=Object.values(state.huntDraft||{}).filter(qid=>qid&&qid!=="none");const unique=[...new Set(observations)].filter(qid=>Q.some(q=>q.id===qid));if(unique.length){state.history.push({scores:{...state.scores},asked:[...state.asked],answered:state.answered,current:state.current,huntMode:false,kind:"huntBatch",observations:[...unique]});unique.forEach(qid=>{const q=Q.find(x=>x.id===qid);apply(q.yes);if(!state.asked.includes(qid))state.asked.push(qid);});state.answered+=unique.length;}state.huntMode=false;state.huntDraft={};state.current=null;document.getElementById("huntQuick").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");nextQuestion();save();}
+function evidenceLines(ghost){const lines=[];for(let idx=state.history.length-1;idx>=0;idx--){const h=state.history[idx];if(h.kind==="huntBatch"){for(const qid of(h.observations||[])){const q=Q.find(x=>x.id===qid);if(!q)continue;const val=q.yes?.[ghost]||0;if(val)lines.push({val,text:"Hunt observation: "+q.q});if(lines.length>=4)break;}}else{const q=Q.find(x=>x.id===h.qid);if(!q||h.kind==="skip")continue;const val=h.kind==="yes"?(q.yes?.[ghost]||0):(q.no?.[ghost]||0);if(val)lines.push({val,text:(h.kind==="yes"?"Observed: ":"Tested no: ")+q.q});}if(lines.length>=4)break;}return lines.slice(0,4);}
+function bestNextTest(ghost){const candidate=Q.filter(q=>!state.asked.includes(q.id)&&((q.yes?.[ghost]||0)>0)).sort((a,b)=>(b.yes?.[ghost]||0)-(a.yes?.[ghost]||0))[0];if(candidate)return candidate.q;const fallback={"The Mimic":"Check for Ghost Orbs plus the ghost's actual evidence, and repeat any signature hunt behavior.","Revenant":"During a safe loop/hide test, compare its searching speed with its speed immediately after detecting someone.","Deogen":"Loop it in open space and confirm whether it becomes extremely slow at close range.","Hantu":"Compare its speed while it travels through cold versus warm rooms.","Raiju":"Place active electronics along one part of a loop and compare speed inside versus outside their range."};return fallback[ghost]||"Repeat the strongest positive behavior under controlled conditions; avoid ruling out a chance-based ghost from one missed ability.";}
+function showResults(){const p=probabilities(),top=p[0]||["Unknown",0],g=top[0];document.getElementById("quiz").classList.add("hidden");document.getElementById("huntQuick").classList.add("hidden");document.getElementById("results").classList.remove("hidden");document.getElementById("topbar").classList.remove("hidden");renderTop3();renderRanking("finalRanking",5);document.getElementById("ghost").textContent=state.answered?g:"Not enough information";document.getElementById("whySummary").textContent=state.answered?`${confidence()}. ${g} currently holds ${top[1].toFixed(1)}% of the model's relative ranking weight.`:"Answer a few observations first.";const lines=evidenceLines(g);document.getElementById("whyBox").innerHTML='<b>Why this is #1</b>'+(lines.length?lines.map(x=>`<div class="whyline ${x.val>0?"plus":"minus"}">${x.val>0?"+":""}${x.val} • ${x.text}</div>`).join(""):'<div class="whyline muted">No direct supporting observation yet.</div>');document.getElementById("nextTest").textContent=bestNextTest(g);save();}
 function backToQuestions(){document.getElementById("results").classList.add("hidden");document.getElementById("huntQuick").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");if(!state.current)state.current=chooseNext()?.id||null;render();save();}
-
-document.getElementById("start").addEventListener("click",startNew);
-document.getElementById("resume").addEventListener("click",resume);
-document.getElementById("yesBtn").addEventListener("click",()=>answer("yes"));
-document.getElementById("noBtn").addEventListener("click",()=>answer("no"));
-document.getElementById("skipBtn").addEventListener("click",()=>answer("skip"));
-document.getElementById("undo").addEventListener("click",undo);
-document.getElementById("huntToggle").addEventListener("click",showHuntQuick);
-document.getElementById("endHunt").addEventListener("click",endHunt);
-document.getElementById("cancelHunt").addEventListener("click",cancelHunt);
-document.getElementById("guess").addEventListener("click",showResults);
-document.getElementById("back").addEventListener("click",backToQuestions);
-document.getElementById("restart").addEventListener("click",startNew);
-
-const stored=load();if(stored)document.getElementById("resume").classList.remove("hidden");
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+document.getElementById("start").addEventListener("click",startNew);document.getElementById("resume").addEventListener("click",resume);document.getElementById("yesBtn").addEventListener("click",()=>answer("yes"));document.getElementById("noBtn").addEventListener("click",()=>answer("no"));document.getElementById("skipBtn").addEventListener("click",()=>answer("skip"));document.getElementById("undo").addEventListener("click",undo);document.getElementById("huntToggle").addEventListener("click",showHuntQuick);document.getElementById("endHunt").addEventListener("click",endHunt);document.getElementById("cancelHunt").addEventListener("click",cancelHunt);document.getElementById("guess").addEventListener("click",showResults);document.getElementById("back").addEventListener("click",backToQuestions);document.getElementById("restart").addEventListener("click",startNew);
+const stored=load();if(stored)document.getElementById("resume").classList.remove("hidden");if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
 </script>
+<script src="./gameplay-v7.js"></script>
 </body>
 </html>
