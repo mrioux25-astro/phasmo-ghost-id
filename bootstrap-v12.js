@@ -1,7 +1,7 @@
 "use strict";
 (() => {
-  const VERSION="v14";
-  const BUILD="Qualitative Speed Language";
+  const VERSION="v15";
+  const BUILD="Behavioral Strategy + Hunt History";
   function addVersion(){
     const home=document.getElementById("home");
     if(!home)return;
@@ -11,13 +11,14 @@
   }
   function load(src,key){if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement("script");s.src=src;s.dataset[key]="1";document.body.appendChild(s);}
   addVersion();
-  load("./gameplay-v11.js?v=14","gameplayV11");
-  load("./gameplay-v13.js?v=14","gameplayV13");
-  load("./speed-language-v14.js?v=14","speedV14");
+  load("./gameplay-v11.js?v=15","gameplayV11");
+  load("./gameplay-v13.js?v=15","gameplayV13");
+  load("./speed-language-v14.js?v=15","speedV14");
+  load("./investigation-v15.js?v=15","investigationV15");
   document.documentElement.dataset.ghostBuild=VERSION;
   if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./sw.js?v=14",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{});
+    navigator.serviceWorker.register("./sw.js?v=15",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{});
     let reloaded=false;
-    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded||sessionStorage.getItem("ghost-v14-reload"))return;reloaded=true;sessionStorage.setItem("ghost-v14-reload","1");location.reload();});
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded||sessionStorage.getItem("ghost-v15-reload"))return;reloaded=true;sessionStorage.setItem("ghost-v15-reload","1");location.reload();});
   }
 })();
