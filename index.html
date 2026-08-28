@@ -9,101 +9,242 @@
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b0e13;color:#f5f7fa;margin:0;padding:18px;min-height:100vh}
-.card{max-width:620px;margin:0 auto;background:#151a22;border:1px solid #293140;border-radius:20px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
-h1{margin:12px 0 8px;font-size:30px} h2{line-height:1.25}
-button{width:100%;padding:16px;margin:7px 0;border:0;border-radius:13px;font-size:17px;font-weight:750;background:#e6edf7;color:#10141b;cursor:pointer}
-button:active{transform:scale(.99)}
-.secondary{background:#293140;color:#fff}
-.muted{color:#aeb8c8;line-height:1.45}.hidden{display:none}
-.pill{display:inline-block;background:#252d39;padding:6px 10px;border-radius:999px;font-size:13px}
-.result{font-size:30px;font-weight:850}
-.rankbox{margin-top:20px;padding-top:18px;border-top:1px solid #303947}
-.ranktitle{font-weight:800;margin-bottom:5px}
-.ranknote{font-size:12px;color:#8f9bad;margin-bottom:12px;line-height:1.35}
-.rankrow{display:grid;grid-template-columns:minmax(105px,1fr) 2fr 48px;gap:9px;align-items:center;margin:9px 0;font-size:14px}
-.rankname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar{height:9px;background:#252d39;border-radius:999px;overflow:hidden}
-.fill{height:100%;background:linear-gradient(90deg,#8da2ff,#dfe7ff);border-radius:999px}
-.pct{text-align:right;font-variant-numeric:tabular-nums;color:#cbd5e1}
-.lead{font-weight:800}
-.status{font-size:13px;color:#aeb8c8;margin-top:4px}
-footer{margin-top:18px;font-size:11px;color:#7f8999;line-height:1.45}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b0e13;color:#f5f7fa;margin:0;padding:0;min-height:100vh}
+.app{max-width:660px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom))}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(11,14,19,.94);backdrop-filter:blur(14px);border:1px solid #252d39;border-radius:16px;padding:10px 12px;margin-bottom:12px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.title{font-weight:850;font-size:18px}.mode{font-size:12px;color:#aeb8c8}
+.top3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}
+.suspect{background:#171d26;border:1px solid #2a3442;border-radius:10px;padding:7px 8px;min-width:0}
+.suspect b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.suspect span{font-size:11px;color:#9eacc0}
+.card{background:#151a22;border:1px solid #293140;border-radius:20px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+h1{margin:8px 0 6px;font-size:29px}h2{font-size:24px;line-height:1.25;margin:10px 0 8px}
+button{width:100%;min-height:54px;padding:15px;margin:6px 0;border:0;border-radius:13px;font-size:17px;font-weight:780;background:#e7edf7;color:#10141b;cursor:pointer}
+button:active{transform:scale(.99)}button.secondary{background:#293140;color:#fff}.danger{background:#3a2328!important;color:#fff!important}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hidden{display:none!important}.muted{color:#aeb8c8;line-height:1.45}
+.pill{display:inline-block;background:#252d39;padding:6px 10px;border-radius:999px;font-size:12px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}.tag{font-size:11px;padding:5px 8px;border-radius:999px;background:#202733;color:#b9c4d4}
+.hint{background:#10151d;border-left:3px solid #5e72a8;border-radius:9px;padding:10px 11px;color:#aeb8c8;font-size:13px;line-height:1.4;margin:10px 0}
+.progress{height:7px;background:#252d39;border-radius:999px;overflow:hidden;margin:7px 0 12px}.progress>div{height:100%;background:#c7d2fe;border-radius:999px}
+.rankbox{margin-top:18px;padding-top:16px;border-top:1px solid #303947}.ranktitle{font-weight:850;margin-bottom:4px}.ranknote{font-size:12px;color:#8f9bad;margin-bottom:10px}
+.rankrow{display:grid;grid-template-columns:minmax(110px,1fr) 2fr 48px;gap:8px;align-items:center;margin:8px 0;font-size:13px}
+.rankname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:8px;background:#252d39;border-radius:999px;overflow:hidden}.fill{height:100%;background:#c7d2fe;border-radius:999px}.pct{text-align:right;color:#cbd5e1}
+.result{font-size:31px;font-weight:900}.whybox{margin-top:12px;background:#10151d;border-radius:12px;padding:12px}.whyline{font-size:13px;line-height:1.4;margin:7px 0}.plus{color:#b9f6ca}.minus{color:#ffb4ab}
+.huntBanner{background:#291f16;border:1px solid #6b4f2d;border-radius:12px;padding:10px 12px;margin:8px 0;font-size:13px;line-height:1.4}
+.small{font-size:12px}.footer{margin-top:16px;font-size:11px;color:#778294;line-height:1.45}
+@media(max-width:430px){.app{padding-left:10px;padding-right:10px}.card{padding:17px}.top3{gap:4px}.suspect{padding:6px}.suspect b{font-size:11px}h2{font-size:22px}}
 </style>
 </head>
 <body>
+<div class="app">
+<div id="topbar" class="topbar hidden">
+  <div class="topline"><div class="title">👻 Ghost ID</div><div id="modeLabel" class="mode">Investigation mode</div></div>
+  <div id="top3" class="top3"></div>
+</div>
+
 <main class="card">
-<div class="pill">Phasmophobia • behavior-first helper</div>
-<h1>👻 Ghost ID Wizard</h1>
 <section id="home">
-<p class="muted">Answer one observation at a time. “Couldn't tell” never hurts a ghost. The ranking is a relative behavior match, not a true spawn probability.</p>
-<button id="start">Start New Investigation</button>
+  <div class="pill">30 current ghosts • behavior-first • offline</div>
+  <h1>Ghost ID Wizard</h1>
+  <p class="muted">Answer only what you actually observed. The app chooses the next question that best separates your leading suspects.</p>
+  <button id="start">Start New Investigation</button>
+  <button id="resume" class="secondary hidden">Resume Investigation</button>
+  <p class="small muted">No GPT/API is used. “Couldn't tell” never penalizes a ghost.</p>
 </section>
+
 <section id="quiz" class="hidden">
-<p id="count" class="muted"></p>
-<h2 id="question"></h2>
-<p id="hint" class="status"></p>
-<div id="answers"></div>
-<button id="undo" class="secondary">Undo Last Answer</button>
-<button id="guess" class="secondary">Show Best Guess</button>
-<div id="ranking" class="rankbox"></div>
+  <div id="huntBanner" class="huntBanner hidden"><b>Hunt Mode:</b> fast questions only—speed, LOS, blinking, electronics, footsteps and detection.</div>
+  <div class="topline"><div id="status" class="muted small"></div><div id="strength" class="pill"></div></div>
+  <div class="progress"><div id="progressFill"></div></div>
+  <h2 id="question"></h2>
+  <div id="qmeta" class="meta"></div>
+  <div id="hint" class="hint"></div>
+  <div id="answers">
+    <button id="yesBtn">Yes — I observed this</button>
+    <button id="noBtn">No — I tested this</button>
+    <button id="skipBtn" class="secondary">Couldn't tell / didn't test</button>
+  </div>
+  <div class="row">
+    <button id="undo" class="secondary">Undo</button>
+    <button id="huntToggle" class="secondary">Start Hunt Mode</button>
+  </div>
+  <button id="guess" class="secondary">Show Best Guess</button>
+  <div id="ranking" class="rankbox"></div>
 </section>
+
 <section id="results" class="hidden">
-<p class="muted">Best current match</p>
-<div id="ghost" class="result"></div>
-<p id="why"></p>
-<p><strong>Next test:</strong> <span id="test"></span></p>
-<div id="finalRanking" class="rankbox"></div>
-<button id="back" class="secondary">Return to Questions</button>
-<button id="restart">New Investigation</button>
+  <p class="muted">Best current match</p>
+  <div id="ghost" class="result"></div>
+  <p id="whySummary" class="muted"></p>
+  <div id="whyBox" class="whybox"></div>
+  <p><strong>Best next test:</strong> <span id="nextTest"></span></p>
+  <div id="finalRanking" class="rankbox"></div>
+  <button id="back" class="secondary">Return to Questions</button>
+  <button id="restart" class="danger">Start New Investigation</button>
 </section>
-<footer>Logic is weighted because many Phasmophobia abilities are chance-based. A “No” only weakens a candidate unless the observation is close to a hard tell. The Mimic remains a caution when another ghost's signature behavior appears.</footer>
+
+<div class="footer">Ranking percentages are relative model weights, not literal spawn probabilities. Positive “hard tells” can strongly identify a ghost; missing a chance-based ability is intentionally penalized only lightly. The Mimic remains in consideration whenever another ghost's signature hunt pattern appears.</div>
 </main>
+</div>
+
 <script>
+"use strict";
 const ghosts=["Spirit","Wraith","Phantom","Poltergeist","Banshee","Jinn","Mare","Revenant","Shade","Demon","Yurei","Oni","Yokai","Hantu","Goryo","Myling","Onryo","The Twins","Raiju","Obake","The Mimic","Moroi","Deogen","Thaye","Dayan","Gallu","Obambo","Kormos","Aswang","Deildegast"];
-const qs=[
-{q:"During a hunt, was it very slow while searching, then extremely fast as soon as it detected a player?",hint:"Classic Revenant speed switch.",yes:{"Revenant":18,"The Mimic":4},no:{"Revenant":-7}},
-{q:"During a hunt, did it become extremely slow when it got very close to a player?",hint:"Deogen slows dramatically near its target.",yes:{"Deogen":20,"The Mimic":4},no:{"Deogen":-8}},
-{q:"Did it become noticeably faster while near active electronic equipment during a hunt?",hint:"Raiju receives a speed boost around active electronics.",yes:{"Raiju":16,"The Mimic":3},no:{"Raiju":-5}},
-{q:"Did it walk through salt without disturbing it?",hint:"A Wraith will not disturb salt.",yes:{"Wraith":20,"The Mimic":3},no:{"Wraith":-10}},
-{q:"Did you see the ghost visibly change model during a hunt?",hint:"Obake shapeshifts on specific hunt blinks; short hunts may not show it.",yes:{"Obake":20,"The Mimic":3},no:{"Obake":-3}},
-{q:"Did hunt speed strongly track room temperature instead of normal line-of-sight acceleration?",hint:"Hantu speed is temperature-dependent.",yes:{"Hantu":17,"The Mimic":3},no:{"Hantu":-6}},
-{q:"Was it very fast/aggressive early in the contract, then noticeably slower or less active later?",hint:"Thaye ages over time.",yes:{"Thaye":16,"The Mimic":3},no:{"Thaye":-4}},
-{q:"Did its hunt behavior or speed clearly change depending on whether a nearby player was moving versus standing still?",hint:"Useful Dayan tell when deliberately tested.",yes:{"Dayan":17,"The Mimic":3},no:{"Dayan":-5}},
-{q:"Could it detect crouching/walking/sprinting from unusual distances while seeming nearly blind unless you moved close to it?",hint:"Kormos can detect player movement; visual LOS is very limited.",yes:{"Kormos":19,"The Mimic":3},no:{"Kormos":-6}},
-{q:"After players interacted with many different non-equipment items, switches, taps, or the breaker before a hunt, did its next hunt become much slower?",hint:"Deildegast starts very fast and loses speed for unique qualifying interactions; it resets after a hunt/hunt attempt.",yes:{"Deildegast":20,"The Mimic":3},no:{"Deildegast":-5}},
-{q:"During hunts, was it invisible for unusually long portions between visible blinks?",hint:"Phantom has long invisible blink periods.",yes:{"Phantom":16,"The Mimic":3},no:{"Phantom":-5}},
-{q:"During hunts, was it unusually visible with short invisible periods between blinks?",hint:"Oni is more visible during hunts.",yes:{"Oni":15,"The Mimic":3},no:{"Oni":-4}},
-{q:"Did it throw several nearby objects at nearly the same time?",hint:"Poltergeist multi-throw is a strong behavior tell.",yes:{"Poltergeist":18,"The Mimic":3},no:{"Poltergeist":-3}},
-{q:"Did you hear the Banshee's distinctive scream through the parabolic microphone?",hint:"A positive scream is very strong; failing to hear it does not rule Banshee out.",yes:{"Banshee":22,"The Mimic":3},no:{"Banshee":-1}},
-{q:"Did it begin a normal hunt at unusually high average sanity?",hint:"Demon can hunt much earlier than most ghosts; several special ghosts also have altered thresholds.",yes:{"Demon":11,"Mare":3,"Yokai":3,"Onryo":3,"Gallu":3,"The Mimic":2},no:{"Demon":-2}},
-{q:"Across different hunts, did you hear two consistent base speeds—one slower and one faster?",hint:"The Twins can hunt at two distinct base speeds. Don't confuse this with LOS acceleration.",yes:{"The Twins":16,"Obambo":7,"The Mimic":3},no:{"The Twins":-5}},
-{q:"Did it become progressively faster as team sanity got lower?",hint:"Moroi speed scales with average sanity.",yes:{"Moroi":17,"The Mimic":3},no:{"Moroi":-5}},
-{q:"Did you get Ghost Orbs plus behavior that strongly looked like another ghost type?",hint:"The Mimic always has fake Ghost Orbs in addition to its actual evidence and can imitate other ghost behaviors.",yes:{"The Mimic":24},no:{"The Mimic":-2}},
-{q:"After salt, incense, or a crucifix use, did its hunt speed/behavior seem to cycle through clearly different states?",hint:"Gallu cycles Normal → Enraged → Weakened, changing speed and other hunt properties.",yes:{"Gallu":20,"The Mimic":3},no:{"Gallu":-4}},
-{q:"During a hunt, could you hear electronic interference before you could clearly hear the ghost's footsteps?",hint:"Myling footsteps become audible at a shorter range than normal.",yes:{"Myling":15,"The Mimic":3},no:{"Myling":-4}},
-{q:"With the breaker ON, did it get a sudden speed boost when it saw a player at distance, but lose that special boost when close?",hint:"Jinn has a breaker-dependent distance speed ability.",yes:{"Jinn":17,"The Mimic":3},no:{"Jinn":-5}},
-{q:"Did it immediately switch a light OFF right after you switched that light ON?",hint:"Mare has a distinctive light-switch ability. It is chance-based.",yes:{"Mare":15,"The Mimic":3},no:{"Mare":-2}},
-{q:"Did it repeatedly try to hunt after the third flame/firelight it extinguished, while nearby lit flames also seemed to block hunts?",hint:"Onryo firelight mechanics make the third extinguished flame a strong test when controlled carefully.",yes:{"Onryo":19,"The Mimic":3},no:{"Onryo":-4}},
-{q:"Was it consistently very inactive around players and unwilling to interact or hunt while someone was close to it?",hint:"Shade is unusually shy, but activity varies and this is not a hard rule-out.",yes:{"Shade":11,"The Mimic":2},no:{"Shade":-2}},
-{q:"Did it hunt unusually early specifically while players were talking near the ghost, yet seem poor at detecting voices/electronics from farther away during hunts?",hint:"Yokai is strongly affected by nearby talking and has reduced hunt detection range.",yes:{"Yokai":17,"The Mimic":3},no:{"Yokai":-4}},
-{q:"If you tested DOTS, did DOTS only appear through a video camera when nobody was physically near the ghost?",hint:"Goryo DOTS has special viewing conditions. Skip this on true 0-evidence runs.",yes:{"Goryo":19,"The Mimic":2},no:{"Goryo":-3}},
-{q:"After incense prevented a hunt, did the ghost stay unable to hunt for about 3 minutes?",hint:"Spirit's incense hunt-prevention timer is about 180 seconds.",yes:{"Spirit":20,"The Mimic":2},no:{"Spirit":-5}},
-{q:"After incense prevented a hunt, could it hunt again after only about 1 minute?",hint:"Demon's incense hunt-prevention timer is about 60 seconds.",yes:{"Demon":19,"The Mimic":2},no:{"Demon":-4}},
-{q:"Did it fully slam an open door shut outside a ghost event and cause a noticeable sanity drop?",hint:"Yurei has a distinctive door ability; it is chance-based.",yes:{"Yurei":16,"The Mimic":3},no:{"Yurei":-2}}
+
+const Q=[
+{id:"rev",cat:"hunt",tier:"hard",targets:["Revenant"],q:"Was it about 1.0 m/s while searching, then instantly around 3.0 m/s after detecting a player?",hint:"Revenant has no standard LOS acceleration: it switches from very slow to very fast on detection.",yes:{"Revenant":26,"The Mimic":5},no:{"Revenant":-12}},
+{id:"deo",cat:"hunt",tier:"hard",targets:["Deogen"],q:"Did it rush toward a player from far away, then slow dramatically to about 0.4 m/s when very close?",hint:"Deogen always senses its target and slows heavily at close range.",yes:{"Deogen":27,"The Mimic":5},no:{"Deogen":-12}},
+{id:"hantu",cat:"hunt",tier:"strong",targets:["Hantu"],q:"Did its speed vary with room temperature rather than speeding up from continuous line of sight?",hint:"Hantu has no normal LOS speed-up; colder rooms make it faster.",yes:{"Hantu":22,"The Mimic":4},no:{"Hantu":-8}},
+{id:"raiju",cat:"hunt",tier:"strong",targets:["Raiju"],q:"Near active player electronics, did its hunt speed snap to a flat ~2.5 m/s, then change again after leaving that range?",hint:"Raiju's strongest speed tell is repeated flat 2.5 m/s sections near active electronics.",yes:{"Raiju":23,"The Mimic":4},no:{"Raiju":-7}},
+{id:"jinn",cat:"hunt",tier:"strong",targets:["Jinn"],q:"With the breaker ON, did it instantly reach ~2.5 m/s while seeing a player from more than ~3 m away, then return to normal behavior when close?",hint:"This distance boost requires the breaker to be on.",yes:{"Jinn":23,"The Mimic":4},no:{"Jinn":-7}},
+{id:"moroi",cat:"hunt",tier:"strong",targets:["Moroi"],q:"Did its base hunt speed become faster as team average sanity dropped, while still gaining normal LOS speed?",hint:"Moroi speed scales with average sanity and can become extremely fast with LOS.",yes:{"Moroi":22,"The Mimic":4},no:{"Moroi":-7}},
+{id:"thaye",cat:"hunt",tier:"strong",targets:["Thaye"],q:"Was it very fast early in the contract, never gaining LOS speed, then slower after players spent time near it?",hint:"A young Thaye is very fast; it ages and slows. Thaye does not gain LOS speed.",yes:{"Thaye":24,"The Mimic":4},no:{"Thaye":-7}},
+{id:"dayan",cat:"hunt",tier:"hard",targets:["Dayan"],q:"Within roughly 10 m of a player, did it move ~2.25 m/s when that player was walking but only ~1.2 m/s when the player stood still?",hint:"Dayan changes speed based on nearby player movement; outside ~10 m it uses standard behavior.",yes:{"Dayan":27,"The Mimic":4},no:{"Dayan":-10}},
+{id:"aswang",cat:"hunt",tier:"strong",targets:["Aswang"],q:"Did it have a slightly slow ~1.53 m/s base speed but accelerate in LOS noticeably faster than a normal ghost?",hint:"Aswang still gains standard-style LOS speed, but reaches the maximum faster than normal.",yes:{"Aswang":22,"The Mimic":4},no:{"Aswang":-7}},
+{id:"kormos",cat:"hunt",tier:"hard",targets:["Kormos"],q:"Could it detect crouching/walking/sprinting from unusual distances while seeming nearly blind unless a moving player was within about 5 m?",hint:"Kormos detects movement at different ranges but has very limited visual LOS.",yes:{"Kormos":27,"The Mimic":4},no:{"Kormos":-10}},
+{id:"deilde",cat:"hunt",tier:"hard",targets:["Deildegast"],q:"After many unique non-equipment item/switch/tap/breaker interactions before the hunt, was the next hunt dramatically slower than its initial ~3.0 m/s speed?",hint:"Deildegast loses ~0.1 m/s per unique qualifying interaction, then resets after a hunt or hunt attempt.",yes:{"Deildegast":27,"The Mimic":4},no:{"Deildegast":-9}},
+{id:"twins",cat:"hunt",tier:"strong",targets:["The Twins"],q:"Across hunts, did you hear two distinct base speeds—roughly one slow and one fast—before LOS acceleration?",hint:"The Twins can hunt using two different base speeds; compare before LOS.",yes:{"The Twins":22,"The Mimic":4},no:{"The Twins":-7}},
+{id:"obake",cat:"hunt",tier:"hard",targets:["Obake"],q:"Did the ghost visibly shapeshift into another model during a hunt blink?",hint:"A positive Obake shapeshift is a very strong tell. Short hunts can end before a scheduled shapeshift.",yes:{"Obake":29,"The Mimic":4},no:{"Obake":-2}},
+{id:"phantom",cat:"hunt",tier:"strong",targets:["Phantom"],q:"During the hunt, was it invisible for unusually long stretches between visible blinks?",hint:"Phantom spends more time invisible during hunt blinking.",yes:{"Phantom":22,"The Mimic":4},no:{"Phantom":-6}},
+{id:"oni",cat:"hunt",tier:"strong",targets:["Oni"],q:"During the hunt, was it unusually visible with shorter invisible periods between blinks?",hint:"Oni is more visible during hunts than a standard ghost.",yes:{"Oni":21,"The Mimic":4},no:{"Oni":-6}},
+{id:"myling",cat:"hunt",tier:"strong",targets:["Myling"],q:"During a hunt, could you notice electronic interference before you could clearly hear its footsteps?",hint:"Myling footsteps become audible from a shorter distance than normal.",yes:{"Myling":20,"The Mimic":4},no:{"Myling":-6}},
+{id:"gallu",cat:"hunt",tier:"hard",targets:["Gallu"],q:"After salt, incense, or a crucifix use, did its hunt behavior cycle through distinct Normal / Enraged / Weakened states with noticeably different speeds?",hint:"Gallu cycles states; the documented speeds differ substantially between those states.",yes:{"Gallu":27,"The Mimic":4},no:{"Gallu":-7}},
+{id:"wraith",cat:"general",tier:"hard",targets:["Wraith"],q:"Did it walk through a salt pile without disturbing the salt?",hint:"A Wraith does not disturb salt.",yes:{"Wraith":29,"The Mimic":3},no:{"Wraith":-16}},
+{id:"polty",cat:"general",tier:"hard",targets:["Poltergeist"],q:"Did it throw multiple nearby objects essentially at the same time?",hint:"A Poltergeist multi-throw is a strong positive tell.",yes:{"Poltergeist":28,"The Mimic":3},no:{"Poltergeist":-2}},
+{id:"banshee",cat:"general",tier:"hard",targets:["Banshee"],q:"Did anyone hear the distinctive Banshee scream through the parabolic microphone?",hint:"Any player can hear it. Failing to get the scream does not rule Banshee out because it is chance-based.",yes:{"Banshee":29,"The Mimic":3},no:{"Banshee":-1}},
+{id:"mare",cat:"general",tier:"strong",targets:["Mare"],q:"Did it immediately switch a light OFF right after a player switched that same light ON?",hint:"Mare has a distinctive light-switch ability, but it is chance-based.",yes:{"Mare":22,"The Mimic":3},no:{"Mare":-2}},
+{id:"onryo",cat:"general",tier:"hard",targets:["Onryo"],q:"In a controlled firelight test, did it repeatedly attempt a hunt tied to the third extinguished flame while lit flames also prevented hunts?",hint:"Onryo firelight behavior is best tested deliberately because cooldowns can affect timing.",yes:{"Onryo":27,"The Mimic":3},no:{"Onryo":-5}},
+{id:"shade",cat:"general",tier:"soft",targets:["Shade"],q:"Was it consistently very inactive around players and reluctant to interact or hunt while someone was close to it?",hint:"Shade is unusually shy, but this is behavioral and should never be treated as a hard rule-out.",yes:{"Shade":13,"The Mimic":2},no:{"Shade":-2}},
+{id:"yokai",cat:"general",tier:"strong",targets:["Yokai"],q:"Did nearby talking make an early hunt more likely, while the ghost seemed poor at detecting voices/electronics from farther away during hunts?",hint:"Yokai is affected by nearby talking and has reduced hunt detection range.",yes:{"Yokai":21,"The Mimic":3},no:{"Yokai":-5}},
+{id:"spirit",cat:"general",tier:"hard",targets:["Spirit"],q:"After incense prevented a hunt, did it remain unable to start another hunt for about 180 seconds?",hint:"Spirit's post-incense hunt-prevention time is about 180 s instead of the normal ~90 s.",yes:{"Spirit":28,"The Mimic":2},no:{"Spirit":-8}},
+{id:"demon",cat:"general",tier:"hard",targets:["Demon"],q:"After incense prevented a hunt, could it hunt again after only about 60 seconds?",hint:"Demon has a shorter post-incense hunt-prevention time of about 60 s.",yes:{"Demon":27,"The Mimic":2},no:{"Demon":-7}},
+{id:"yurei",cat:"general",tier:"strong",targets:["Yurei"],q:"Did it fully slam an open door shut outside a ghost event and cause a noticeable sanity drain?",hint:"Yurei's distinctive door ability is chance-based.",yes:{"Yurei":22,"The Mimic":3},no:{"Yurei":-2}},
+{id:"goryo",cat:"evidence",tier:"hard",targets:["Goryo"],q:"When DOTS was available, did DOTS appear only through a video camera while no player was physically near the ghost?",hint:"Skip this on true 0-evidence. Goryo DOTS has special viewing conditions.",yes:{"Goryo":27,"The Mimic":2},no:{"Goryo":-5}},
+{id:"mimic",cat:"evidence",tier:"hard",targets:["The Mimic"],q:"Did you get Ghost Orbs plus a separate valid evidence set or a signature behavior that seemed to belong to another ghost?",hint:"The Mimic can imitate hunt patterns and has fake Ghost Orbs in addition to its real evidence.",yes:{"The Mimic":32},no:{"The Mimic":-2}}
 ];
-let i=0,scores={},history=[],answered=0;
+
+let state={scores:{},asked:[],history:[],answered:0,huntMode:false,current:null,started:false};
+
 function freshScores(){return Object.fromEntries(ghosts.map(g=>[g,0]));}
-function ranked(){return Object.entries(scores).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]));}
-function probabilities(){const r=ranked();if(answered===0)return r.map(([g])=>[g,100/ghosts.length]);const vals=r.map(([g,s])=>[g,Math.exp(Math.max(-35,Math.min(60,s))/10)]);const sum=vals.reduce((a,x)=>a+x[1],0);return vals.map(([g,v])=>[g,100*v/sum]);}
-function renderRanking(id){const box=document.getElementById(id);const p=probabilities().slice(0,5);const max=p[0]?.[1]||1;box.innerHTML='<div class="ranktitle">Most likely right now</div><div class="ranknote">Top 5 relative behavior matches. These percentages are ranking weights, not literal in-game spawn odds.</div>'+p.map(([g,v],idx)=>`<div class="rankrow ${idx===0?'lead':''}"><div class="rankname">${idx+1}. ${g}</div><div class="bar"><div class="fill" style="width:${Math.max(4,v/max*100).toFixed(1)}%"></div></div><div class="pct">${v.toFixed(1)}%</div></div>`).join('');}
-function reset(){i=0;scores=freshScores();history=[];answered=0;document.getElementById('home').classList.add('hidden');document.getElementById('results').classList.add('hidden');document.getElementById('quiz').classList.remove('hidden');render();}
-function render(){if(i>=qs.length)return show();document.getElementById('count').textContent=`Question ${i+1} of ${qs.length}`;document.getElementById('question').textContent=qs[i].q;document.getElementById('hint').textContent=qs[i].hint||'';const a=document.getElementById('answers');a.innerHTML='';[['Yes','yes'],['No','no'],["Couldn't tell / didn't test",'unknown']].forEach(([t,v])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>answer(v);a.appendChild(b);});renderRanking('ranking');}
-function apply(map){Object.entries(map||{}).forEach(([g,d])=>scores[g]=(scores[g]||0)+d);}
-function answer(v){history.push({i,scores:{...scores},answered});if(v==='yes'){apply(qs[i].yes);answered++;}else if(v==='no'){apply(qs[i].no);answered++;}i++;render();}
-function nextTestFor(g){const tests={"Revenant":"Hide, then deliberately let it detect someone at a safe looping spot and listen for the slow→very-fast switch.","Deogen":"Loop it in an open area and see whether it becomes extremely slow at close range.","Wraith":"Place salt directly in its path and watch whether it disturbs the pile.","Obake":"Watch several long hunt blinks for a model change; a short hunt can miss it.","Hantu":"Compare hunt speed in cold versus warm parts of the map.","Thaye":"Compare early-contract hunt speed/activity with much later behavior.","Kormos":"During a controlled hunt, compare detection while standing still versus crouching/walking/sprinting.","Deildegast":"Before the next hunt, interact with many unique qualifying objects/switches, then compare hunt speed.","Gallu":"Trigger a state change with salt/incense/crucifix and compare the next hunt behavior.","Spirit":"Time the hunt-prevention window after incense; Spirit is about 180 seconds.","Demon":"Time the hunt-prevention window after incense; Demon can hunt again after about 60 seconds.","Onryo":"Run a controlled firelight test and watch for a hunt attempt tied to the third extinguished flame.","The Mimic":"Check for Ghost Orbs plus a separate valid evidence set, and repeat any signature behavior.","The Twins":"Compare base footstep speed across multiple hunts, avoiding LOS acceleration.","Raiju":"Compare speed near active electronics versus an area with electronics removed/off."};return tests[g]||"Repeat the strongest behavior test under controlled conditions; one missed chance-based ability should not rule a ghost out.";}
-function show(){const r=ranked(),top=r[0],p=probabilities();document.getElementById('quiz').classList.add('hidden');document.getElementById('results').classList.remove('hidden');document.getElementById('ghost').textContent=answered?top[0]:'Not enough information yet';const topPct=p.find(x=>x[0]===top[0])?.[1]||0;document.getElementById('why').textContent=answered?`${top[0]} currently has the strongest behavior match (${topPct.toFixed(1)}% of the model's relative ranking weight). This is not a literal probability.`:'Answer a few observations first.';document.getElementById('test').textContent=answered?nextTestFor(top[0]):'Observe at least one hunt and answer the speed/behavior questions.';renderRanking('finalRanking');}
-document.getElementById('start').addEventListener('click',reset);document.getElementById('restart').addEventListener('click',reset);document.getElementById('guess').addEventListener('click',show);document.getElementById('back').addEventListener('click',()=>{document.getElementById('results').classList.add('hidden');document.getElementById('quiz').classList.remove('hidden');render();});document.getElementById('undo').addEventListener('click',()=>{const h=history.pop();if(!h)return;i=h.i;scores=h.scores;answered=h.answered;render();});if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+function save(){try{localStorage.setItem("ghostWizardV4",JSON.stringify(state));}catch(e){}}
+function load(){try{const x=JSON.parse(localStorage.getItem("ghostWizardV4")||"null");if(x&&x.started&&x.scores&&x.asked)return x;}catch(e){}return null;}
+function ranked(){return Object.entries(state.scores).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));}
+function probabilities(){
+  const r=ranked();
+  if(state.answered===0)return r.map(([g])=>[g,100/ghosts.length]);
+  const vals=r.map(([g,s])=>[g,Math.exp(Math.max(-45,Math.min(70,s))/11)]);
+  const sum=vals.reduce((a,x)=>a+x[1],0)||1;
+  return vals.map(([g,v])=>[g,100*v/sum]);
+}
+function topCandidates(n=6){return probabilities().slice(0,n).map(x=>x[0]);}
+function questionUtility(q){
+  const top=topCandidates(8);
+  const yesVals=top.map(g=>(q.yes&&q.yes[g])||0);
+  const noVals=top.map(g=>(q.no&&q.no[g])||0);
+  const spread=a=>{const m=a.reduce((x,y)=>x+y,0)/Math.max(1,a.length);return a.reduce((s,x)=>s+(x-m)*(x-m),0)/Math.max(1,a.length);};
+  let u=spread(yesVals)+0.55*spread(noVals);
+  const direct=q.targets.filter(g=>top.includes(g)).length;
+  u+=direct*15;
+  if(q.tier==="hard")u+=5; else if(q.tier==="strong")u+=2;
+  if(state.answered<3 && q.cat==="hunt")u+=3;
+  return u;
+}
+function chooseNext(){
+  let pool=Q.filter(q=>!state.asked.includes(q.id));
+  if(state.huntMode)pool=pool.filter(q=>q.cat==="hunt");
+  if(!pool.length && state.huntMode){state.huntMode=false;pool=Q.filter(q=>!state.asked.includes(q.id));}
+  if(!pool.length)return null;
+  return pool.sort((a,b)=>questionUtility(b)-questionUtility(a))[0];
+}
+function apply(map){Object.entries(map||{}).forEach(([g,d])=>state.scores[g]=(state.scores[g]||0)+d);}
+function startNew(){state={scores:freshScores(),asked:[],history:[],answered:0,huntMode:false,current:null,started:true};document.getElementById("home").classList.add("hidden");document.getElementById("results").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");document.getElementById("topbar").classList.remove("hidden");nextQuestion();save();}
+function resume(){const x=load();if(!x)return startNew();state=x;document.getElementById("home").classList.add("hidden");document.getElementById("results").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");document.getElementById("topbar").classList.remove("hidden");if(!state.current||state.asked.includes(state.current))state.current=chooseNext()?.id||null;render();}
+
+function renderTop3(){
+  const p=probabilities().slice(0,3);
+  document.getElementById("top3").innerHTML=p.map(([g,v],i)=>`<div class="suspect"><b>${i+1}. ${g}</b><span>${v.toFixed(1)}% match</span></div>`).join("");
+  document.getElementById("modeLabel").textContent=state.huntMode?"Hunt Mode":"Investigation mode";
+}
+function renderRanking(id,limit=5){
+  const p=probabilities().slice(0,limit),max=p[0]?.[1]||1;
+  document.getElementById(id).innerHTML='<div class="ranktitle">Most likely right now</div><div class="ranknote">Relative behavior-match weights—not literal spawn odds.</div>'+p.map(([g,v],idx)=>`<div class="rankrow"><div class="rankname"><b>${idx+1}. ${g}</b></div><div class="bar"><div class="fill" style="width:${Math.max(3,v/max*100).toFixed(1)}%"></div></div><div class="pct">${v.toFixed(1)}%</div></div>`).join("");
+}
+function confidence(){
+  const p=probabilities();if(state.answered<2)return"Low confidence";
+  const gap=(p[0]?.[1]||0)-(p[1]?.[1]||0);
+  if(gap>45&&state.answered>=3)return"Very strong";
+  if(gap>25)return"Strong";
+  if(gap>12)return"Moderate";
+  return"Low confidence";
+}
+function render(){
+  renderTop3();renderRanking("ranking",5);
+  const q=Q.find(x=>x.id===state.current);
+  if(!q)return showResults();
+  document.getElementById("question").textContent=q.q;
+  document.getElementById("hint").textContent=q.hint;
+  document.getElementById("qmeta").innerHTML=`<span class="tag">${q.cat==="hunt"?"Hunt observation":q.cat==="evidence"?"Evidence / camera":"General behavior"}</span><span class="tag">${q.tier==="hard"?"Hard positive tell":q.tier==="strong"?"Strong tell":"Soft behavior"}</span>`;
+  const remaining=Q.length-state.asked.length;
+  document.getElementById("status").textContent=`${state.answered} answered • ${remaining} unasked`;
+  document.getElementById("strength").textContent=confidence();
+  document.getElementById("progressFill").style.width=`${Math.min(100,state.asked.length/Q.length*100)}%`;
+  document.getElementById("huntBanner").classList.toggle("hidden",!state.huntMode);
+  document.getElementById("huntToggle").textContent=state.huntMode?"End Hunt Mode":"Start Hunt Mode";
+}
+function nextQuestion(){const q=chooseNext();state.current=q?q.id:null;render();save();}
+function answer(kind){
+  const q=Q.find(x=>x.id===state.current);if(!q)return;
+  state.history.push({scores:{...state.scores},asked:[...state.asked],answered:state.answered,current:state.current,huntMode:state.huntMode,kind,qid:q.id});
+  if(kind==="yes"){apply(q.yes);state.answered++;}
+  else if(kind==="no"){apply(q.no);state.answered++;}
+  state.asked.push(q.id);state.current=null;nextQuestion();
+}
+function undo(){
+  const h=state.history.pop();if(!h)return;
+  state.scores=h.scores;state.asked=h.asked;state.answered=h.answered;state.current=h.current;state.huntMode=h.huntMode;render();save();
+}
+function toggleHunt(){state.huntMode=!state.huntMode;state.current=null;nextQuestion();}
+function evidenceLines(ghost){
+  const lines=[];
+  for(let idx=state.history.length-1;idx>=0;idx--){
+    const h=state.history[idx],q=Q.find(x=>x.id===h.qid);if(!q||h.kind==="skip")continue;
+    const val=h.kind==="yes"?(q.yes?.[ghost]||0):(q.no?.[ghost]||0);
+    if(val)lines.push({val,text:(h.kind==="yes"?"Observed: ":"Tested no: ")+q.q});
+    if(lines.length>=4)break;
+  }
+  return lines;
+}
+function bestNextTest(ghost){
+  const candidate=Q.filter(q=>!state.asked.includes(q.id)&&((q.yes?.[ghost]||0)>0)).sort((a,b)=>(b.yes?.[ghost]||0)-(a.yes?.[ghost]||0))[0];
+  if(candidate)return candidate.q;
+  const fallback={"The Mimic":"Check for Ghost Orbs plus the ghost's actual evidence, and repeat any signature hunt behavior.","Revenant":"During a safe loop/hide test, compare its searching speed with its speed immediately after detecting someone.","Deogen":"Loop it in open space and confirm whether it becomes extremely slow at close range.","Hantu":"Compare its speed while it travels through cold versus warm rooms.","Raiju":"Place active electronics along one part of a loop and compare speed inside versus outside their range."};
+  return fallback[ghost]||"Repeat the strongest positive behavior under controlled conditions; avoid ruling out a chance-based ghost from one missed ability.";
+}
+function showResults(){
+  const p=probabilities(),top=p[0]||["Unknown",0],g=top[0];
+  document.getElementById("quiz").classList.add("hidden");document.getElementById("results").classList.remove("hidden");document.getElementById("topbar").classList.remove("hidden");
+  renderTop3();renderRanking("finalRanking",5);
+  document.getElementById("ghost").textContent=state.answered?g:"Not enough information";
+  document.getElementById("whySummary").textContent=state.answered?`${confidence()}. ${g} currently holds ${top[1].toFixed(1)}% of the model's relative ranking weight.`:"Answer a few observations first.";
+  const lines=evidenceLines(g);
+  document.getElementById("whyBox").innerHTML='<b>Why this is #1</b>'+(lines.length?lines.map(x=>`<div class="whyline ${x.val>0?"plus":"minus"}">${x.val>0?"+":""}${x.val} • ${x.text}</div>`).join(""):'<div class="whyline muted">No direct supporting observation yet.</div>');
+  document.getElementById("nextTest").textContent=bestNextTest(g);save();
+}
+function backToQuestions(){document.getElementById("results").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");if(!state.current)state.current=chooseNext()?.id||null;render();save();}
+
+document.getElementById("start").addEventListener("click",startNew);
+document.getElementById("resume").addEventListener("click",resume);
+document.getElementById("yesBtn").addEventListener("click",()=>answer("yes"));
+document.getElementById("noBtn").addEventListener("click",()=>answer("no"));
+document.getElementById("skipBtn").addEventListener("click",()=>answer("skip"));
+document.getElementById("undo").addEventListener("click",undo);
+document.getElementById("huntToggle").addEventListener("click",toggleHunt);
+document.getElementById("guess").addEventListener("click",showResults);
+document.getElementById("back").addEventListener("click",backToQuestions);
+document.getElementById("restart").addEventListener("click",startNew);
+
+const stored=load();if(stored)document.getElementById("resume").classList.remove("hidden");
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
 </script>
 </body>
 </html>
