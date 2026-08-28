@@ -1,0 +1,51 @@
+"use strict";
+(() => {
+  const $=id=>document.getElementById(id);
+  const style=document.createElement("style");
+  style.textContent=`.howtoBtn{background:#202733!important;color:#fff!important;border:1px solid #394659!important}.howtoIntro{margin:14px 0 4px;padding:14px;background:#10151d;border:1px solid #293140;border-radius:14px}.howtoIntro h3{margin:0 0 6px;font-size:16px}.howtoIntro p{margin:0;color:#aeb8c8;font-size:13px;line-height:1.45}.guideSteps{display:grid;gap:9px;margin:13px 0}.guideStep{display:grid;grid-template-columns:34px 1fr;gap:10px;background:#10151d;border:1px solid #293140;border-radius:13px;padding:11px}.stepNum{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#293140;font-weight:900}.guideStep b{display:block;margin-bottom:3px}.guideStep span{font-size:13px;color:#aeb8c8;line-height:1.4}.guideButtons{display:grid;gap:8px;margin:12px 0}.guideButton{background:#10151d;border:1px solid #293140;border-radius:13px;padding:12px}.guideButton b{display:block;font-size:15px;margin-bottom:4px}.guideButton span{display:block;font-size:13px;color:#aeb8c8;line-height:1.42}.guideTip{background:#2b2414;border:1px solid #69582c;border-radius:12px;padding:11px;font-size:13px;line-height:1.45;margin:12px 0}.guideOverlay{position:fixed;inset:0;z-index:150;background:rgba(4,7,11,.94);backdrop-filter:blur(12px);overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 10px calc(20px + env(safe-area-inset-bottom))}.guideCard{max-width:640px;margin:0 auto;background:#151a22;border:1px solid #354052;border-radius:19px;padding:17px}.guideHead{display:flex;justify-content:space-between;align-items:center;gap:8px}.guideHead button{width:auto;min-height:42px;padding:8px 12px;font-size:13px}.guideHidden{display:none!important}`;
+  document.head.appendChild(style);
+
+  const home=$("home");
+  if(home&&!$("howToBtn")){
+    const intro=document.createElement("div");
+    intro.className="howtoIntro";
+    intro.innerHTML='<h3>New here?</h3><p>Use this companion while you play. Log evidence and behaviors as you see them, and it will narrow the 30 ghosts and suggest what to test next.</p><button id="howToBtn" class="howtoBtn">📖 How to Use This App</button>';
+    const resume=$("resume");
+    if(resume) resume.insertAdjacentElement("afterend",intro); else home.appendChild(intro);
+  }
+
+  const overlay=document.createElement("div");
+  overlay.id="guideOverlay";overlay.className="guideOverlay guideHidden";
+  overlay.innerHTML=`<div class="guideCard">
+    <div class="guideHead"><div><div class="pill">📖 Quick Guide</div><h2 style="margin-bottom:3px">How to use Ghost ID</h2></div><button id="guideClose" class="secondary">Close</button></div>
+    <p class="muted">You do not need to answer every question. The goal is to record what you actually know and let the app choose the most useful next test.</p>
+    <div class="guideSteps">
+      <div class="guideStep"><div class="stepNum">1</div><div><b>Start an investigation</b><span>Tap <strong>Start New Investigation</strong>. The app begins with all 30 ghosts possible.</span></div></div>
+      <div class="guideStep"><div class="stepNum">2</div><div><b>Enter what you discover</b><span>Use <strong>Evidence</strong> for EMF 5, UV, Writing, Freezing, Spirit Box, DOTS and Orbs. Use <strong>Observe</strong> when you notice a ghost behavior or special tell.</span></div></div>
+      <div class="guideStep"><div class="stepNum">3</div><div><b>Log hunts while they happen</b><span>Tap the red <strong>HUNT</strong> button as a hunt starts. Record speed, line-of-sight acceleration, blinking and unusual detection, then end the hunt when it stops.</span></div></div>
+      <div class="guideStep"><div class="stepNum">4</div><div><b>Let the app guide the investigation</b><span>Tap <strong>Next Test</strong> when you want the most useful thing to try next. A strong ghost-specific tell will trigger a focused confirmation test instead of making you answer unrelated questions.</span></div></div>
+      <div class="guideStep"><div class="stepNum">5</div><div><b>Stop when the identification is strong</b><span>Once independent evidence/tells clearly separate one ghost, the app can stop early and show the best identification. You can keep testing if you want more confirmation.</span></div></div>
+    </div>
+    <h3>Main buttons</h3>
+    <div class="guideButtons">
+      <div class="guideButton"><b>🧪 Evidence</b><span>Enter found evidence, evidence you reliably tested and did not find, difficulty, available equipment, manual rule-outs, and the incense timer.</span></div>
+      <div class="guideButton"><b>👻 Observe</b><span>Log a behavior you saw outside the normal question flow. For strong tells, choose how certain you are so an uncertain observation does not overpower better evidence.</span></div>
+      <div class="guideButton"><b>🔴 HUNT</b><span>Quick hunt logger and timer. Use it during a hunt to capture speed, LOS behavior, blinking and detection without digging through questions.</span></div>
+      <div class="guideButton"><b>🎯 Next Test</b><span>Shows the best practical test for separating your current leading suspects using the equipment you marked as available.</span></div>
+      <div class="guideButton"><b>Yes — I observed this</b><span>Use when the displayed behavior really happened. Strong observations may ask whether you are definitely, pretty sure, or only maybe sure.</span></div>
+      <div class="guideButton"><b>No — I tested this</b><span>Use only when you actually performed the relevant test and the behavior did not occur. Do not use No just because you have not seen a chance-based ability yet.</span></div>
+      <div class="guideButton"><b>Not Sure → Next</b><span>Use whenever you did not test something, missed it, or are unsure. It moves on without penalizing any ghost.</span></div>
+      <div class="guideButton"><b>Undo</b><span>Removes your most recent scored answer if you tapped something by mistake.</span></div>
+    </div>
+    <div class="guideTip"><b>Important:</b> Treat the app as an investigation assistant, not a checklist you must finish. Enter only reliable observations. The Mimic can copy many ghost behaviors, so signature tells are checked against evidence whenever possible.</div>
+    <button id="guideStart">Got It — Start Investigation</button>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  function show(){overlay.classList.remove("guideHidden");}
+  function hide(){overlay.classList.add("guideHidden");}
+  $("howToBtn")?.addEventListener("click",show);
+  $("guideClose").addEventListener("click",hide);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)hide();});
+  $("guideStart").addEventListener("click",()=>{hide();$("start")?.click();});
+})();
