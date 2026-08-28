@@ -58,7 +58,5 @@ document.addEventListener("click",e=>{
  },0);
 },true);
 
-// Update visible version marker if present.
-const badge=$("appVersionBadge");if(badge)badge.innerHTML='<span><b style="color:#f5f7fa">Ghost ID v14</b><br>Qualitative Speed Language</span><span style="font-size:11px">Current build</span>';
-document.documentElement.dataset.ghostBuild="v14";
+// Compatibility layer only: do not overwrite the current app version badge/build marker.
 })();
