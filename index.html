@@ -49,7 +49,6 @@ button:active{transform:scale(.99)}button.secondary{background:#293140;color:#ff
   <div class="topline"><div class="title">👻 Ghost ID</div><div id="modeLabel" class="mode">Investigation mode</div></div>
   <div id="top3" class="top3"></div>
 </div>
-
 <main class="card">
 <section id="home">
   <div class="pill">30 current ghosts • behavior-first • offline</div>
@@ -59,7 +58,6 @@ button:active{transform:scale(.99)}button.secondary{background:#293140;color:#ff
   <button id="resume" class="secondary hidden">Resume Investigation</button>
   <p class="small muted">No GPT/API is used. “Couldn't tell” never penalizes a ghost.</p>
 </section>
-
 <section id="quiz" class="hidden">
   <div id="huntBanner" class="huntBanner hidden"><b>Hunt Mode:</b> fast questions only—speed, LOS, blinking, electronics, footsteps and detection.</div>
   <div class="topline"><div id="status" class="muted small"></div><div id="strength" class="pill"></div></div>
@@ -67,43 +65,14 @@ button:active{transform:scale(.99)}button.secondary{background:#293140;color:#ff
   <h2 id="question"></h2>
   <div id="qmeta" class="meta"></div>
   <div id="hint" class="hint"></div>
-  <div id="answers">
-    <button id="yesBtn">Yes — I observed this</button>
-    <button id="noBtn">No — I tested this</button>
-    <button id="skipBtn" class="secondary">Couldn't tell / didn't test</button>
-  </div>
-  <div class="row">
-    <button id="undo" class="secondary">Undo</button>
-    <button id="huntToggle" class="secondary">Log a Hunt</button>
-  </div>
-  <button id="guess" class="secondary">Show Best Guess</button>
-  <div id="ranking" class="rankbox"></div>
+  <div id="answers"><button id="yesBtn">Yes — I observed this</button><button id="noBtn">No — I tested this</button><button id="skipBtn" class="secondary">Couldn't tell / didn't test</button></div>
+  <div class="row"><button id="undo" class="secondary">Undo</button><button id="huntToggle" class="secondary">Log a Hunt</button></div>
+  <button id="guess" class="secondary">Show Best Guess</button><div id="ranking" class="rankbox"></div>
 </section>
-
-<section id="huntQuick" class="hidden">
-  <div class="huntIntro"><b>🔥 Hunt Quick Entry</b><br><span class="small">Tap only what you clearly noticed during this hunt. You do not need to answer every category.</span></div>
-  <div id="huntGroups"></div>
-  <div class="huntActions">
-    <button id="endHunt">End Hunt & Apply Observations</button>
-    <button id="cancelHunt" class="secondary">Cancel — Apply Nothing</button>
-  </div>
-</section>
-
-<section id="results" class="hidden">
-  <p class="muted">Best current match</p>
-  <div id="ghost" class="result"></div>
-  <p id="whySummary" class="muted"></p>
-  <div id="whyBox" class="whybox"></div>
-  <p><strong>Best next test:</strong> <span id="nextTest"></span></p>
-  <div id="finalRanking" class="rankbox"></div>
-  <button id="back" class="secondary">Return to Questions</button>
-  <button id="restart" class="danger">Start New Investigation</button>
-</section>
-
+<section id="huntQuick" class="hidden"><div class="huntIntro"><b>🔥 Hunt Quick Entry</b><br><span class="small">Tap only what you clearly noticed during this hunt. You do not need to answer every category.</span></div><div id="huntGroups"></div><div class="huntActions"><button id="endHunt">End Hunt & Apply Observations</button><button id="cancelHunt" class="secondary">Cancel — Apply Nothing</button></div></section>
+<section id="results" class="hidden"><p class="muted">Best current match</p><div id="ghost" class="result"></div><p id="whySummary" class="muted"></p><div id="whyBox" class="whybox"></div><p><strong>Best next test:</strong> <span id="nextTest"></span></p><div id="finalRanking" class="rankbox"></div><button id="back" class="secondary">Return to Questions</button><button id="restart" class="danger">Start New Investigation</button></section>
 <div class="footer">Ranking percentages are relative model weights, not literal spawn probabilities. Positive “hard tells” can strongly identify a ghost; missing a chance-based ability is intentionally penalized only lightly. The Mimic remains in consideration whenever another ghost's signature hunt pattern appears.</div>
-</main>
-</div>
-
+</main></div>
 <script>
 "use strict";
 const ghosts=["Spirit","Wraith","Phantom","Poltergeist","Banshee","Jinn","Mare","Revenant","Shade","Demon","Yurei","Oni","Yokai","Hantu","Goryo","Myling","Onryo","The Twins","Raiju","Obake","The Mimic","Moroi","Deogen","Thaye","Dayan","Gallu","Obambo","Kormos","Aswang","Deildegast"];
@@ -170,5 +139,7 @@ document.getElementById("start").addEventListener("click",startNew);document.get
 const stored=load();if(stored)document.getElementById("resume").classList.remove("hidden");if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
 </script>
 <script src="./gameplay-v7.js"></script>
+<script src="./companion-v8.js"></script>
+<script src="./howto-v9.js"></script>
 </body>
 </html>
