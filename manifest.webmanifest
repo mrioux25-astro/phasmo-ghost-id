@@ -1,1 +1,1 @@
-{"name":"Ghost ID Wizard","short_name":"Ghost ID","start_url":"./","display":"standalone","background_color":"#0b0e13","theme_color":"#0b0e13","description":"A no-API Phasmophobia ghost identification wizard."}
+{"id":"./","name":"Ghost ID Wizard","short_name":"Ghost ID","start_url":"./?pwa214=1","scope":"./","display":"standalone","background_color":"#0b0e13","theme_color":"#0b0e13","description":"A no-API Phasmophobia ghost identification wizard."}
