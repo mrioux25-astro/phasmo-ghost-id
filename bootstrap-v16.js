@@ -1,1 +1,1 @@
-"use strict";(()=>{if(document.querySelector('script[data-bootstrap-v20]'))return;const s=document.createElement('script');s.async=false;s.src='./bootstrap-v20.js?v=20-legacy';s.dataset.bootstrapV20='1';document.body.appendChild(s);})();
+"use strict";(()=>{if(document.querySelector('script[data-bootstrap-v21]'))return;const s=document.createElement('script');s.async=false;s.src='./bootstrap-v21.js?v=21-legacy';s.dataset.bootstrapV21='1';document.body.appendChild(s);})();
