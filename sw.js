@@ -1,19 +1,19 @@
-const CACHE='ghost-id-v21-3';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./gameplay-v7.js','./companion-v8.js','./howto-v9.js','./gameplay-v11.js','./gameplay-v13.js','./speed-language-v14.js','./investigation-v15.js','./top-ghosts-v16.js','./remaining-ghosts-v18.js','./evidence-aware-v19.js','./gameplay-qol-v20.js','./v21-core.js','./gameplay-minor-v21.js','./map-open-v21-3.js','./bootstrap-v21.js'];
+const CACHE='ghost-id-v21-4';
+const ASSETS=['./index.html','./manifest.webmanifest','./gameplay-v7.js','./companion-v8.js','./howto-v9.js','./gameplay-v11.js','./gameplay-v13.js','./speed-language-v14.js','./investigation-v15.js','./top-ghosts-v16.js','./remaining-ghosts-v18.js','./evidence-aware-v19.js','./gameplay-qol-v20.js','./v21-core.js','./gameplay-minor-v21.js','./map-open-v21-3.js','./gameplay-qol-v21-4.js','./bootstrap-v21.js'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
-self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))),self.clients.claim()])));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();const cs=await self.clients.matchAll({type:'window',includeUncontrolled:true});for(const c of cs){try{const u=new URL(c.url);if(u.origin!==self.location.origin)continue;if(u.searchParams.get('pwa214')==='1')continue;u.searchParams.set('pwa214','1');await c.navigate(u.href);}catch(err){}}})()));
 self.addEventListener('fetch',e=>{
   if(e.request.mode==='navigate'){
     e.respondWith(fetch(e.request,{cache:'no-store'}).then(async r=>{
       let t=await r.text();
       t=t.replace(/<script src="\.\/bootstrap-v(?:12|15|16|17|18|19|20|21)\.js[^\"]*"><\/script>/g,'');
-      t=t.replace('</body>','<script src="./bootstrap-v21.js?v=21.3"></script></body>');
+      t=t.replace('</body>','<script src="./bootstrap-v21.js?v=21.4"></script></body>');
       const out=new Response(t,{status:r.status,statusText:r.statusText,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store, no-cache, must-revalidate'}});
-      const copy=out.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return out;
+      return out;
     }).catch(async()=>{
-      const cached=await caches.match(e.request);if(!cached)return Response.error();let t=await cached.text();
+      const cached=await caches.match('./index.html');if(!cached)return Response.error();let t=await cached.text();
       t=t.replace(/<script src="\.\/bootstrap-v(?:12|15|16|17|18|19|20|21)\.js[^\"]*"><\/script>/g,'');
-      t=t.replace('</body>','<script src="./bootstrap-v21.js?v=21.3"></script></body>');
+      t=t.replace('</body>','<script src="./bootstrap-v21.js?v=21.4"></script></body>');
       return new Response(t,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
     }));return;
   }
